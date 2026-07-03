@@ -46,6 +46,11 @@ function getShareTitle(localized) {
 
 function handleNewsClick(item) {
   state.currentNewsItem = item;
+  
+  const url = new URL(window.location.href);
+  url.searchParams.set("id", item.id);
+  history.pushState(null, "", url);
+  
   renderCurrentNewsDetail();
   showDetailView();
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -60,6 +65,18 @@ function renderCurrentNewsList() {
   }));
   
   renderNewsList(formattedList, handleNewsClick);
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  const sharedId = urlParams.get("id");
+  
+  if (sharedId && !state.currentNewsItem) {
+    const item = state.newsList.find(n => n.id == sharedId);
+    if (item) {
+      handleNewsClick(item);
+      return;
+    }
+  }
+
   showListView();
   
   updateSeo({
@@ -139,6 +156,11 @@ function initializeControls() {
   if (refs.backToNewsBtn) {
     refs.backToNewsBtn.addEventListener("click", () => {
       state.currentNewsItem = null;
+      
+      const url = new URL(window.location.href);
+      url.searchParams.delete("id");
+      history.pushState(null, "", url);
+      
       showListView();
     });
   }
