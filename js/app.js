@@ -164,6 +164,29 @@ function initializeControls() {
       showListView();
     });
   }
+
+  if (refs.shareBtn) {
+    refs.shareBtn.addEventListener("click", async () => {
+      const shareData = {
+        title: document.title,
+        text: "Check out this news from Your Daily Light",
+        url: window.location.href
+      };
+      
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+        } catch (err) {
+          console.log("Error sharing:", err);
+        }
+      } else {
+        // Fallback for browsers that don't support Web Share API
+        navigator.clipboard.writeText(window.location.href)
+          .then(() => alert("Link copied to clipboard!"))
+          .catch(err => console.error("Could not copy link", err));
+      }
+    });
+  }
   
   window.addEventListener("popstate", (event) => {
     const urlParams = new URLSearchParams(window.location.search);

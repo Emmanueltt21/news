@@ -18,6 +18,7 @@ const refs = {
   newsListView: document.getElementById("news-list-view"),
   newsGrid: document.getElementById("news-grid"),
   backToNewsBtn: document.getElementById("back-to-news-btn"),
+  shareBtn: document.getElementById("share-btn"),
 };
 
 function sanitizeHtml(html) {
@@ -81,6 +82,7 @@ export function showListView() {
   refs.errorState.classList.add("d-none");
   refs.content.classList.add("d-none");
   refs.newsListView.classList.remove("d-none");
+  if (refs.shareBtn) refs.shareBtn.classList.add("d-none");
 }
 
 export function showDetailView() {
@@ -91,6 +93,7 @@ export function showDetailView() {
   refs.content.classList.add("is-visible");
   refs.content.style.opacity = "1";
   refs.content.style.transform = "translateY(0)";
+  if (refs.shareBtn) refs.shareBtn.classList.remove("d-none");
 }
 
 export function renderNewsList(newsArray, onClickCallback) {
