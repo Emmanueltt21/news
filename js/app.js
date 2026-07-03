@@ -30,7 +30,9 @@ const state = {
 function formatDisplayDate(dateString, language) {
   if (!dateString) return "";
   try {
-    const date = new Date(dateString);
+    // Replace hyphens with slashes to ensure the date is parsed as local time instead of UTC, avoiding timezone offset issues
+    const normalizedDateString = dateString.replace(/-/g, '/');
+    const date = new Date(normalizedDateString);
     if (isNaN(date.getTime())) return dateString;
     const locale = language === "FR" ? "fr-FR" : language === "DE" ? "de-DE" : "en-US";
     const options = { weekday: "short", month: "short", day: "numeric", year: "numeric" };
@@ -61,6 +63,7 @@ function renderCurrentNewsList() {
   // Add thumbnailUrl to items for the list view
   const formattedList = state.newsList.map(item => ({
     ...item,
+    date: formatDisplayDate(item.dou || item.init_date || item.date || item.created_at, state.currentLanguage),
     thumbnailUrl: buildImageUrl(item)
   }));
   
@@ -97,7 +100,7 @@ function renderCurrentNewsDetail() {
   renderNewsDetail({
     localized,
     author: state.currentNewsItem.author || state.currentNewsItem.source || "",
-    displayDate: formatDisplayDate(state.currentNewsItem.date || state.currentNewsItem.created_at, state.currentLanguage),
+    displayDate: formatDisplayDate(state.currentNewsItem.dou || state.currentNewsItem.init_date || state.currentNewsItem.date || state.currentNewsItem.created_at, state.currentLanguage),
     imageUrl,
     language: state.currentLanguage,
     uiCopy,
