@@ -366,6 +366,36 @@ body {
   line-height: 1.6;
 }
 
+/* News List Styles */
+.news-list-view {
+  padding: 25px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.news-card {
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  height: 100%;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.news-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-soft);
+}
+
+.news-card-img-top {
+  height: 200px;
+  object-fit: cover;
+  width: 100%;
+  background: #e0e7ef;
+}
+
+
 @media (min-width: 768px) {
   .devotional-image {
     height: 400px;

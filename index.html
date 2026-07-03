@@ -70,14 +70,25 @@
       <div id="error-state" class="error-state d-none" role="alert">
         <div class="card border-0 shadow-sm error-card">
           <div class="card-body text-center py-4">
-            <h2 class="h5 fw-bold mb-2">Unable to load devotional.</h2>
+            <h2 class="h5 fw-bold mb-2">Unable to load news.</h2>
             <p class="text-body-secondary mb-3">Please try again.</p>
             <button id="retry-button" class="btn btn-primary px-4" type="button">Retry</button>
           </div>
         </div>
       </div>
 
+      <section id="news-list-view" class="news-list-view d-none">
+        <div class="row g-3" id="news-grid">
+          <!-- News cards will be injected here -->
+        </div>
+      </section>
+
       <article id="devotional-content" class="devotional-content d-none" aria-labelledby="devotional-title">
+        <div class="mb-4">
+          <button id="back-to-news-btn" class="btn btn-outline-secondary btn-sm" aria-label="Back to News">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back
+          </button>
+        </div>
         <div class="content-column">
           <h1 id="devotional-title" class="devotional-title"></h1>
           <div style="height: 5px;"></div>

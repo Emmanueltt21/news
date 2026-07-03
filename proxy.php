@@ -11,8 +11,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-// The target backend API
-$url = 'https://app.yourdailylight.org/dailylight/devotionals';
+// Handle dynamic action, default to fetch_newsm
+$action = isset($_GET['action']) ? $_GET['action'] : 'fetch_newsm';
+$url = 'https://app.yourdailylight.org/dailylight/' . $action;
 
 // Read the incoming JSON payload from the frontend
 $data = file_get_contents('php://input');

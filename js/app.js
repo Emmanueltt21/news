@@ -1,6 +1,4 @@
-
-import { fetchDevotional, buildImageUrl } from "./api.js";
-import { getCachedDevotional, setCachedDevotional } from "./cache.js";
+import { fetchNews, buildImageUrl } from "./api.js";
 import {
   DEFAULT_LANGUAGE,
   SUPPORTED_LANGUAGES,
@@ -11,102 +9,78 @@ import {
 } from "./language.js";
 import {
   getRefs,
-  renderDevotional,
+  renderNewsDetail,
+  renderNewsList,
   showLoader,
   showError,
+  showListView,
+  showDetailView,
   updateSeo,
 } from "./ui.js";
 
 const refs = getRefs();
 
 const state = {
-  currentDate: "",
   currentLanguage: getStoredLanguage(),
-  devotional: null,
+  newsList: [],
+  currentNewsItem: null,
+  currentPage: 0
 };
 
-function pad(number) {
-  return String(number).padStart(2, "0");
-}
-
-function toDateString(date) {
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-}
-
-function fromDateString(dateString) {
-  const [year, month, day] = dateString.split("-").map(Number);
-  return new Date(year, month - 1, day);
-}
-
-function shiftDays(date, amount) {
-  const shifted = new Date(date);
-  shifted.setDate(shifted.getDate() + amount);
-  return shifted;
-}
-
-function getAllowedDateRange() {
-  const today = new Date();
-  const maxDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const minDate = shiftDays(maxDate, -5);
-  return { minDate, maxDate };
-}
-
-function isDateAllowed(dateString) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return false;
-  const { minDate, maxDate } = getAllowedDateRange();
-  const selectedDate = fromDateString(dateString);
-  return selectedDate >= minDate && selectedDate <= maxDate;
-}
-
-function getInitialDate() {
-  const url = new URL(window.location.href);
-  const requestedDate = url.searchParams.get("date");
-  if (requestedDate && isDateAllowed(requestedDate)) return requestedDate;
-  return toDateString(getAllowedDateRange().maxDate);
-}
-
 function formatDisplayDate(dateString, language) {
-  const date = fromDateString(dateString);
-  const locale = language === "FR" ? "fr-FR" : language === "DE" ? "de-DE" : "en-US";
-  const options = { weekday: "short", month: "short", day: "numeric", year: "numeric" };
-  return date.toLocaleDateString(locale, options);
-}
-
-function updatePageUrl(dateString) {
-  const url = new URL(window.location.href);
-  url.searchParams.set("date", dateString);
-  history.replaceState(null, "", url);
-}
-
-function getCurrentShareUrl() {
-  const url = new URL(window.location.href);
-  url.searchParams.set("date", state.currentDate);
-  return url.toString();
+  if (!dateString) return "";
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    const locale = language === "FR" ? "fr-FR" : language === "DE" ? "de-DE" : "en-US";
+    const options = { weekday: "short", month: "short", day: "numeric", year: "numeric" };
+    return date.toLocaleDateString(locale, options);
+  } catch (e) {
+    return dateString;
+  }
 }
 
 function getShareTitle(localized) {
-  return localized.title || "Daily Devotional";
+  return localized.title || "Daily Light News";
 }
 
-function renderCurrentDevotional() {
-  console.log("=== renderCurrentDevotional called!");
-  if (!state.devotional) {
-    console.log("No devotional in state, returning!");
-    return;
-  }
-  console.log("State devotional:", state.devotional);
+function handleNewsClick(item) {
+  state.currentNewsItem = item;
+  renderCurrentNewsDetail();
+  showDetailView();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-  const localized = getLocalizedDevotional(state.devotional, state.currentLanguage);
-  console.log("Localized content:", localized);
-
+function renderCurrentNewsList() {
   const uiCopy = getUiCopy(state.currentLanguage);
-  const imageUrl = buildImageUrl(state.devotional);
-  console.log("Built image URL:", imageUrl);
+  // Add thumbnailUrl to items for the list view
+  const formattedList = state.newsList.map(item => ({
+    ...item,
+    thumbnailUrl: buildImageUrl(item)
+  }));
+  
+  renderNewsList(formattedList, handleNewsClick);
+  showListView();
+  
+  updateSeo({
+    title: "News List",
+    htmlContent: "Latest news from Your Daily Light",
+    imageUrl: "",
+    url: window.location.href,
+  });
+}
 
-  renderDevotional({
+function renderCurrentNewsDetail() {
+  if (!state.currentNewsItem) return;
+
+  const localized = getLocalizedDevotional(state.currentNewsItem, state.currentLanguage);
+  const uiCopy = getUiCopy(state.currentLanguage);
+  const imageUrl = buildImageUrl(state.currentNewsItem);
+
+  renderNewsDetail({
     localized,
-    author: state.devotional.author,
-    displayDate: formatDisplayDate(state.currentDate, state.currentLanguage),
+    author: state.currentNewsItem.author || state.currentNewsItem.source || "",
+    displayDate: formatDisplayDate(state.currentNewsItem.date || state.currentNewsItem.created_at, state.currentLanguage),
     imageUrl,
     language: state.currentLanguage,
     uiCopy,
@@ -116,40 +90,23 @@ function renderCurrentDevotional() {
     title: getShareTitle(localized),
     htmlContent: localized.content,
     imageUrl,
-    url: getCurrentShareUrl(),
+    url: window.location.href,
   });
-  console.log("renderCurrentDevotional finished!");
 }
 
-async function loadDevotional(dateString, options = {}) {
-  console.log("=== loadDevotional called with date:", dateString);
+async function loadNewsList(options = {}) {
   const uiCopy = getUiCopy(state.currentLanguage);
-  state.currentDate = dateString;
-  updatePageUrl(dateString);
   showLoader(uiCopy);
 
   try {
-    let devotional = !options.force ? getCachedDevotional(dateString) : null;
-    console.log("Cached devotional found:", devotional ? "YES" : "NO");
-
-    if (!devotional) {
-      console.log("Fetching devotional from API for date:", dateString);
-      devotional = await fetchDevotional(dateString);
-      console.log("API response devotional:", devotional);
-      setCachedDevotional(dateString, devotional);
-    }
-
-    state.devotional = devotional;
-    window.devotionalDebug = devotional;
-    console.log("Calling renderCurrentDevotional...");
-    renderCurrentDevotional();
+    const news = await fetchNews(state.currentPage);
+    state.newsList = news;
+    renderCurrentNewsList();
   } catch (error) {
-    console.error("Error loading devotional:", error);
-    console.error("Error details:", error.message);
+    console.error("Error loading news:", error);
     showError(uiCopy);
   }
 }
-
 
 function handleLanguageChange(event) {
   const selectedLanguage = SUPPORTED_LANGUAGES.includes(event.target.value)
@@ -158,23 +115,38 @@ function handleLanguageChange(event) {
 
   state.currentLanguage = selectedLanguage;
   setStoredLanguage(selectedLanguage);
-  renderCurrentDevotional();
+  
+  if (state.currentNewsItem) {
+    renderCurrentNewsDetail();
+  } else {
+    renderCurrentNewsList();
+  }
 }
 
 function initializeControls() {
   const languageSelect = document.getElementById("language-select");
-  languageSelect.value = state.currentLanguage;
-  languageSelect.addEventListener("change", handleLanguageChange);
+  if (languageSelect) {
+    languageSelect.value = state.currentLanguage;
+    languageSelect.addEventListener("change", handleLanguageChange);
+  }
 
-  refs.retryButton.addEventListener("click", () => {
-    loadDevotional(state.currentDate, { force: true });
-  });
+  if (refs.retryButton) {
+    refs.retryButton.addEventListener("click", () => {
+      loadNewsList({ force: true });
+    });
+  }
+
+  if (refs.backToNewsBtn) {
+    refs.backToNewsBtn.addEventListener("click", () => {
+      state.currentNewsItem = null;
+      showListView();
+    });
+  }
 }
 
 function initializeApp() {
-  state.currentDate = getInitialDate();
   initializeControls();
-  loadDevotional(state.currentDate);
+  loadNewsList();
 }
 
 initializeApp();

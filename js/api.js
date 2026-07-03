@@ -17,40 +17,34 @@ export function buildImageUrl(devotional) {
   return `${API_THUMBNAIL_BASE}${imageFilename}`;
 }
 
-export async function fetchDevotional(dateString) {
-  console.log("fetchDevotional called for date:", dateString);
+export async function fetchNews(page = 0) {
+  console.log("fetchNews called for page:", page);
   
   try {
-    console.log("Trying real API via proxy for:", dateString);
-    const response = await fetch("proxy.php", {
+    console.log("Trying real API via proxy for page:", page);
+    const response = await fetch("proxy.php?action=fetch_newsm", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ data: { date: dateString } }),
+      body: JSON.stringify({
+        data: {
+          email: "null",
+          version: "v2",
+          page: page.toString(),
+          media_type: "news"
+        }
+      }),
     });
 
     if (response.ok) {
       const result = await response.json();
       console.log("Real API response:", result);
       if (result && (result.status === "success" || result.status === "ok")) {
-        const apiData = result.data || result.devotional;
-        if (apiData) {
-          console.log("Successfully fetched real devotional!");
-          return apiData;
-        }
+        return result.news || [];
       }
     }
   } catch (e) {
     console.log("Real API failed:", e);
   }
 
-  // Fallback to empty state if API fails
-  return {
-    title: "Devotional Not Found",
-    author: "",
-    content: "<p>We could not load the devotional for this date.</p>",
-    bible_reading: "",
-    confession: "",
-    studies: "",
-    date: dateString
-  };
+  return [];
 }

@@ -15,6 +15,9 @@ const refs = {
   body: document.getElementById("devotional-body"),
   confession: document.getElementById("confession-content"),
   studies: document.getElementById("studies-content"),
+  newsListView: document.getElementById("news-list-view"),
+  newsGrid: document.getElementById("news-grid"),
+  backToNewsBtn: document.getElementById("back-to-news-btn"),
 };
 
 function sanitizeHtml(html) {
@@ -65,14 +68,68 @@ export function showLoader(copy) {
 export function showError(copy) {
   refs.loader.classList.add("d-none");
   refs.content.classList.add("d-none");
+  refs.newsListView.classList.add("d-none");
   refs.errorState.classList.remove("d-none");
   refs.errorTitle.textContent = copy.errorTitle;
   refs.errorText.textContent = copy.errorText;
   refs.retryButton.textContent = copy.retry;
 }
 
-export function renderDevotional({ localized, author, displayDate, imageUrl, language, uiCopy }) {
-  console.log("=== renderDevotional called!");
+export function showListView() {
+  refs.loader.classList.add("d-none");
+  refs.errorState.classList.add("d-none");
+  refs.content.classList.add("d-none");
+  refs.newsListView.classList.remove("d-none");
+}
+
+export function showDetailView() {
+  refs.loader.classList.add("d-none");
+  refs.errorState.classList.add("d-none");
+  refs.newsListView.classList.add("d-none");
+  refs.content.classList.remove("d-none");
+  refs.content.classList.add("is-visible");
+  refs.content.style.opacity = "1";
+  refs.content.style.transform = "translateY(0)";
+}
+
+export function renderNewsList(newsArray, onClickCallback) {
+  refs.newsGrid.innerHTML = "";
+  
+  if (!newsArray || newsArray.length === 0) {
+    refs.newsGrid.innerHTML = `
+      <div class="col-12 text-center py-5">
+        <p class="text-muted">No news available at the moment.</p>
+      </div>
+    `;
+    return;
+  }
+
+  newsArray.forEach((item, index) => {
+    const localized = item.en || item; // Fallback structure if localized is different
+    const title = localized.title || "News";
+    // Build image URL using the api function, or just use thumbnail
+    // we'll assume it's passed or available. Let's just create a card
+    
+    // We don't have api.js imported here, so we just assume item.thumbnailUrl is set in app.js
+    
+    const col = document.createElement("div");
+    col.className = "col-12 col-md-6 col-lg-4";
+    col.innerHTML = `
+      <div class="news-card">
+        <img src="${item.thumbnailUrl || ''}" class="news-card-img-top" alt="${title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'1200\\' height=\\'675\\' viewBox=\\'0 0 1200 675\\'%3E%3Cdefs%3E%3ClinearGradient id=\\'grad\\' x1=\\'0%25\\' y1=\\'0%25\\' x2=\\'100%25\\' y2=\\'100%25\\'%3E%3Cstop offset=\\'0%25\\' style=\\'stop-color:%23f0f7fb;stop-opacity:1\\' /%3E%3Cstop offset=\\'100%25\\' style=\\'stop-color:%23e0e7ef;stop-opacity:1\\' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill=\\'url(%23grad)\\' width=\\'1200\\' height=\\'675\\'/%3E%3C/svg%3E'">
+        <div class="p-3">
+          <h5 class="fw-bold mb-2">${title}</h5>
+          <p class="text-muted small mb-0">${item.date || ''}</p>
+        </div>
+      </div>
+    `;
+    col.querySelector(".news-card").addEventListener("click", () => onClickCallback(item));
+    refs.newsGrid.appendChild(col);
+  });
+}
+
+export function renderNewsDetail({ localized, author, displayDate, imageUrl, language, uiCopy }) {
+  console.log("=== renderNewsDetail called!");
   console.log("  All refs:", refs);
   
   // Title
@@ -118,17 +175,9 @@ export function renderDevotional({ localized, author, displayDate, imageUrl, lan
   console.log("  localized.studies:", localized.studies);
   renderSection(refs.studies, localized.studies);
 
-  // Show the content
-  refs.loader.classList.add("d-none");
-  refs.errorState.classList.add("d-none");
-  refs.content.classList.remove("d-none");
-  refs.content.classList.add("is-visible");
-  refs.content.style.opacity = "1";
-  refs.content.style.transform = "translateY(0)";
-
   document.documentElement.lang = language.toLowerCase();
   
-  console.log("=== renderDevotional complete!");
+  console.log("=== renderNewsDetail complete!");
 }
 
 export function updateSeo({ title, htmlContent, imageUrl, url }) {
