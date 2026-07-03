@@ -23,7 +23,6 @@ const state = {
   currentDate: "",
   currentLanguage: getStoredLanguage(),
   devotional: null,
-  picker: null,
 };
 
 function pad(number) {
@@ -162,49 +161,6 @@ function handleLanguageChange(event) {
   renderCurrentDevotional();
 }
 
-function initializeDatePicker() {
-  console.log("=== initializeDatePicker called!");
-  const { minDate, maxDate } = getAllowedDateRange();
-  console.log("Date range min:", minDate, "max:", maxDate);
-
-  state.picker = window.flatpickr(refs.datePicker, {
-    defaultDate: state.currentDate,
-    minDate,
-    maxDate,
-    dateFormat: "d M, Y",
-    disableMobile: true,
-    allowInput: false,
-    onChange: (selectedDates) => {
-      console.log("=== Date picker onChange triggered!");
-      console.log("Selected dates from flatpickr:", selectedDates);
-      
-      if (!selectedDates.length) {
-        console.log("No dates selected!");
-        return;
-      }
-
-      const nextDate = toDateString(selectedDates[0]);
-      console.log("Formatted nextDate:", nextDate);
-      
-      if (nextDate !== state.currentDate) {
-        console.log("New date is different, calling loadDevotional with force=true!");
-        // Clear old devotional first to show loading state properly
-        state.devotional = null;
-        loadDevotional(nextDate, { force: true });
-      } else {
-        console.log("Same date as before, doing nothing.");
-      }
-    },
-  });
-
-  refs.dateButton.addEventListener("click", () => {
-    console.log("Date button clicked, opening picker!");
-    state.picker.open();
-  });
-  
-  console.log("Date picker initialized!");
-}
-
 function initializeControls() {
   const languageSelect = document.getElementById("language-select");
   languageSelect.value = state.currentLanguage;
@@ -218,7 +174,6 @@ function initializeControls() {
 function initializeApp() {
   state.currentDate = getInitialDate();
   initializeControls();
-  initializeDatePicker();
   loadDevotional(state.currentDate);
 }
 

@@ -15,8 +15,6 @@ const refs = {
   body: document.getElementById("devotional-body"),
   confession: document.getElementById("confession-content"),
   studies: document.getElementById("studies-content"),
-  datePicker: document.getElementById("date-picker"),
-  dateButton: document.getElementById("date-button"),
 };
 
 function sanitizeHtml(html) {
