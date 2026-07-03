@@ -117,7 +117,7 @@ async function loadNewsList(options = {}) {
 
   try {
     const news = await fetchNews(state.currentPage);
-    state.newsList = news;
+    state.newsList = news.slice(0, 4);
     renderCurrentNewsList();
   } catch (error) {
     console.error("Error loading news:", error);
