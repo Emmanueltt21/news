@@ -1,0 +1,447 @@
+:root {
+  --brand-blue: #014567;
+  --brand-blue-dark: #014567;
+  --brand-blue-accent: #006087;
+  --brand-blue-light: #03ABC2;
+  --brand-blue-soft: #f0f7fb;
+  --text-main: #000000;
+  --text-soft: #000000de;
+  --surface: #ffffff;
+  --border-soft: rgba(1, 69, 103, 0.1);
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --radius-md: 0px;
+  --content-width: 100%;
+  --transition-fast: 200ms ease;
+  --transition-base: 350ms ease;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: #ffffff;
+  color: var(--text-main);
+  line-height: 1.6;
+}
+
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -50px;
+  z-index: 1000;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: var(--brand-blue-dark);
+  color: white;
+  text-decoration: none;
+  transition: top var(--transition-fast);
+}
+
+.skip-link:focus {
+  top: 16px;
+}
+
+.topbar {
+  background: linear-gradient(180deg, var(--brand-blue-accent) 0%, var(--brand-blue-dark) 100%);
+  padding: 16px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.topbar-inner {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 25px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+  text-decoration: none;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.brand img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.toolbar-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.toolbar-control:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.toolbar-control .form-select {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 0;
+  cursor: pointer;
+}
+
+.toolbar-control .form-select option {
+  color: var(--text-main);
+}
+
+.toolbar-control .flatpickr-input {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 0;
+  cursor: pointer;
+  width: 110px;
+}
+
+.page-main {
+  padding: 0 0 40px;
+}
+
+.devotional-card {
+  max-width: 100%;
+  margin: 0 auto;
+  background: var(--surface);
+}
+
+.loader-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 600px;
+  gap: 16px;
+  padding: 40px 25px;
+}
+
+.loader-wrap .spinner-border {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--brand-blue-dark);
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.error-state {
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 25px;
+}
+
+.devotional-content {
+  display: block;
+  padding: 25px;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity var(--transition-base), transform var(--transition-base);
+}
+
+.devotional-content.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.content-column {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.devotional-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #000000;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.devotional-author {
+  margin-top: 5px;
+  font-size: 18px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.87);
+  text-align: center;
+  width: 100%;
+}
+
+.divider {
+  height: 5px;
+  width: 100%;
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  margin: 10px 0 5px 0;
+}
+
+.devotional-date {
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.87);
+  text-align: center;
+  width: 100%;
+}
+
+.hero-media {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.devotional-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  background: #e0e7ef;
+  opacity: 1;
+  transition: opacity var(--transition-base) 0.1s;
+}
+
+.devotional-image.is-loaded {
+  opacity: 1;
+}
+
+.section {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.section-content {
+  width: 100%;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  color: #000 !important;
+  min-height: 50px !important;
+}
+
+.bible-reading-content {
+  font-size: 17px;
+  color: #000000;
+  line-height: 1.6;
+}
+
+.body-content {
+  font-size: 20px;
+  color: #000000;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.confession-content {
+  font-size: 20px;
+  color: #000000;
+  line-height: 1.6;
+}
+
+.studies-content {
+  font-size: 20px;
+  color: #000000;
+  line-height: 1.6;
+}
+
+.rich-content p {
+  margin-bottom: 1em;
+}
+
+.rich-content p:last-child {
+  margin-bottom: 0;
+}
+
+.rich-content a {
+  color: var(--brand-blue-accent);
+  text-decoration: underline;
+}
+
+.site-footer {
+  background: var(--brand-blue-soft);
+  padding: 40px 25px;
+  text-align: center;
+}
+
+.footer-badges {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.store-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  background: #111;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.store-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.store-badge i {
+  font-size: 32px;
+}
+
+.store-badge small {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.store-badge strong {
+  font-size: 18px;
+  display: block;
+}
+
+.footer-copy {
+  color: var(--text-soft);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+@media (min-width: 768px) {
+  .devotional-image {
+    height: 400px;
+  }
+}
+
+@media (max-width: 767px) {
+  .topbar {
+    padding: 10px 0;
+  }
+
+  .topbar-inner {
+    flex-direction: row;
+    align-items: center;
+    padding: 0 10px;
+  }
+  
+  .brand img {
+    height: 32px;
+    width: 32px;
+    object-fit: contain;
+  }
+
+  .brand span {
+    display: inline;
+    font-size: 16px;
+    margin-left: 6px;
+  }
+
+  .toolbar-actions {
+    width: auto;
+    gap: 4px;
+  }
+  
+  .toolbar-control {
+    padding: 6px 8px;
+    position: relative;
+    flex: 0 0 auto;
+  }
+
+
+  .language-control .form-select,
+  .date-button .flatpickr-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .footer-badges {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 8px;
+    justify-content: center;
+    padding: 0 10px;
+  }
+
+  .store-badge {
+    padding: 8px 10px;
+    gap: 6px;
+    width: 50%;
+    justify-content: center;
+  }
+
+  .store-badge i {
+    font-size: 18px;
+  }
+
+  .store-badge strong {
+    font-size: 12px;
+  }
+
+  .store-badge small {
+    font-size: 9px;
+  }
+}
