@@ -4,9 +4,9 @@ const DEFAULT_LANGUAGE = "EN";
 const SUPPORTED_LANGUAGES = ["EN", "FR", "DE"];
 
 const UI_COPIES = {
-  EN: { loading: "Loading devotional...", errorTitle: "Unable to load devotional.", errorText: "Please try again.", retry: "Retry" },
-  FR: { loading: "Chargement du dévot...", errorTitle: "Impossible de charger le dévot.", errorText: "Veuillez réessayer.", retry: "Réessayer" },
-  DE: { loading: "Andacht wird geladen...", errorTitle: "Andacht konnte nicht geladen werden.", errorText: "Bitte versuchen Sie es erneut.", retry: "Erneut versuchen" },
+  EN: { loading: "Loading Your Daily Light News...", errorTitle: "Unable to load news.", errorText: "Please try again.", retry: "Retry" },
+  FR: { loading: "Chargement de Your Daily Light News...", errorTitle: "Impossible de charger les actualités.", errorText: "Veuillez réessayer.", retry: "Réessayer" },
+  DE: { loading: "Your Daily Light News wird geladen...", errorTitle: "Nachrichten konnten nicht geladen werden.", errorText: "Bitte versuchen Sie es erneut.", retry: "Erneut versuchen" },
 };
 
 function findField(devotional, baseName, language) {

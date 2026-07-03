@@ -62,6 +62,7 @@ export function showLoader(copy) {
   refs.loader.classList.remove("d-none");
   refs.errorState.classList.add("d-none");
   refs.content.classList.add("d-none");
+  refs.newsListView.classList.add("d-none");
   refs.loaderText.textContent = copy.loading;
 }
 
