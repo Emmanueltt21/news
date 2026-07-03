@@ -49,7 +49,7 @@ function handleNewsClick(item) {
   
   const url = new URL(window.location.href);
   url.searchParams.set("id", item.id);
-  history.pushState(null, "", url);
+  window.history.pushState({ id: item.id }, "", url);
   
   renderCurrentNewsDetail();
   showDetailView();
@@ -159,11 +159,28 @@ function initializeControls() {
       
       const url = new URL(window.location.href);
       url.searchParams.delete("id");
-      history.pushState(null, "", url);
+      window.history.pushState({ id: null }, "", url);
       
       showListView();
     });
   }
+  
+  window.addEventListener("popstate", (event) => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedId = urlParams.get("id");
+    
+    if (sharedId) {
+      const item = state.newsList.find(n => n.id == sharedId);
+      if (item) {
+        state.currentNewsItem = item;
+        renderCurrentNewsDetail();
+        showDetailView();
+      }
+    } else {
+      state.currentNewsItem = null;
+      showListView();
+    }
+  });
 }
 
 function initializeApp() {
